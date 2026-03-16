@@ -24,22 +24,37 @@ jobs:
         with:
           gradle-version: "8.7"
 
-      - name: Dosya yapısını listele
+      - name: Klasör yapısını göster
         run: |
+          echo "PWD:"
           pwd
+          echo "ROOT LIST:"
           ls -la
-          find . -maxdepth 3 -type f | head -200
+          echo "TOP 4 LEVEL FILES:"
+          find . -maxdepth 4 -type f | sort
 
-      - name: Debug APK build
-        run: gradle assembleDebug --stacktrace
+      - name: Gradle dosyalarını bul
+        run: |
+          echo "settings.gradle / settings.gradle.kts:"
+          find . \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | sort
+          echo "build.gradle / build.gradle.kts:"
+          find . \( -name "build.gradle" -o -name "build.gradle.kts" \) | sort
+          echo "gradlew:"
+          find . -name "gradlew" | sort || true
+
+      - name: Kökten build dene
+        run: gradle assembleDebug --stacktrace --info
 
       - name: APK dosyalarını listele
-        run: find . -type f | grep ".apk" || true
+        if: always()
+        run: find . -type f | grep "\.apk" || true
 
       - name: APK yükle
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: |
             app/build/outputs/apk/debug/*.apk
             */app/build/outputs/apk/debug/*.apk
+            */*/app/build/outputs/apk/debug/*.apk
