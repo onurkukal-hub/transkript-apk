@@ -9,10 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: transkript-apk
-
     steps:
       - name: Projeyi çek
         uses: actions/checkout@v4
@@ -28,6 +24,12 @@ jobs:
         with:
           gradle-version: "8.7"
 
+      - name: Dosya yapısını listele
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 3 -type f | head -200
+
       - name: Debug APK build
         run: gradle assembleDebug --stacktrace
 
@@ -38,4 +40,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: transkript-apk/app/build/outputs/apk/debug/*.apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            */app/build/outputs/apk/debug/*.apk
